@@ -2,15 +2,10 @@ package frc.robot.subsystems.drivetrain;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonPoseEstimator;
-
 import com.ctre.phoenix6.SignalLogger;
-import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.core.CoreCANrange;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
@@ -21,39 +16,20 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.path.PathConstraints;
-
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants;
-import frc.robot.seafinder2.SF2Constants;
-import frc.robot.seafinder2.commands.StopDrivetrain;
-import frc.robot.seafinder2.utils.Target;
-import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.drivetrain.TunerConstants.TunerSwerveDrivetrain;
 
 /**
@@ -355,19 +331,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             // LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left").pose);
             // field.getObject("Vision2").setPose(
             // LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right").pose);
-
-            List<EstimatedRobotPose> estimatedRobotPoses = VisionSubsystem.getGlobalFieldPoses();
-            
-
-            for (EstimatedRobotPose estimatedRobotPose : estimatedRobotPoses) {
-                if (estimatedRobotPose != null) {
-                    alignToVision(estimatedRobotPose, false);
-                    field.getObject("Vision1").setPose(getEstimator());
-                }
-                else {
-                  //  System.out.println("Estimated pose NULL");
-                }
-            }
         }
     }
 
@@ -447,63 +410,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return estimator.getEstimatedPosition();
     }
 
-    public double getForwardRangeLeft() {
-        StatusSignal<Distance> d = robotRangeLeft.getDistance();
-        return (robotRangeLeft.getIsDetected().getValueAsDouble()==1) ?
-        d.getValueAsDouble() : Double.MAX_VALUE;
-        // return Math.min(d.getValueAsDouble(), 1.5);
-    }
-
-    public double getForwardRangeRight() {
-        // StatusSignal<Distance> d = robotRangeRight.getDistance();
-        StatusSignal<Distance> d = robotRangeRight.getDistance();
-        return (robotRangeRight.getIsDetected().getValueAsDouble()==1) ?
-        d.getValueAsDouble() : Double.MAX_VALUE;
-        // return Math.min(d.getValueAsDouble(), 1.5);
-    }
-
-    public double getForwardRangeCombined() {
-        return Math.min(getForwardRangeLeft(), getForwardRangeRight());
-    }
-
-    public double getBackRange() {
-        StatusSignal<Distance> d = robotRangeBack.getDistance();
-        return (robotRangeBack.getIsDetected().getValueAsDouble()==1) ?
-        d.getValueAsDouble() : Double.MAX_VALUE;
-        // return Math.min(d.getValueAsDouble(), 1.5);
-    }
-
-    public boolean isCANRangeInThreshold() {
-        StatusSignal<Distance> dL = robotRangeLeft.getDistance();
-        StatusSignal<Distance> dR = robotRangeRight.getDistance();
-        double dMin = Math.min(dL.getValueAsDouble(), dR.getValueAsDouble());
-        return (dMin > 0.5 && dMin < 0.55);
-    }
-
-    int rnhpClock = 0;
-
-    public boolean robotNearHP() { //TODO
-        
-        // for (LimelightObject limelight : SF2Constants.LIMELIGHTS_ON_BOARD) {
-        //     if ((int) LimelightHelpers.getFiducialID(limelight.name) != -1) {
-        //         // rnhpClock++; // helper to make sure that we aren't seeing tag
-        //         // if (rnhpClock > 8) {
-        //         //     System.out.println("TAG VISIBLE: " + LimelightHelpers.getFiducialID(limelight.name));
-        //         //     rnhpClock = 0;
-        //         // }
-        //         return false;
-        //     }
-        // }
-        // StatusSignal<Distance> dL = robotRangeLeft.getDistance();
-        // StatusSignal<Distance> dR = robotRangeRight.getDistance();
-        // // double fL = robotRangeLeft.getIsDetected().getValueAsDouble() == 1 ? dL.getValueAsDouble() : 10000;
-        // // double fR = robotRangeRight.getIsDetected().getValueAsDouble() == 1 ? dR.getValueAsDouble() : 10000;
-        // // double dMin = Math.min(fL, fR);
-        // // return (dMin < 1.4);
-        // return (robotRangeLeft.getIsDetected().getValueAsDouble() == 1 || robotRangeRight.getIsDetected().getValueAsDouble() == 1);
-
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
 
     public void setLabel(Pose2d pose2d, String label) {
         field.getObject(label).setPose(pose2d);
@@ -517,70 +423,4 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             resetRotation(new Rotation2d(Math.PI));
         }
     }
-
-    public Command getPathfinderCommand(AprilTagFieldLayout atf, Target target) {
-        if (atf == null) {
-            System.out.println("FIELD MAP NOT READY");
-            return new InstantCommand(() -> {});
-        }
-        Optional<Pose3d> tagTargetPre = atf.getTagPose(target.getTag());
-        if (!tagTargetPre.isPresent()) {
-            throw new IllegalArgumentException("Tag " + target.getTag() + " not found in field layout");
-            // return new InstantCommand(() -> {});
-        }
-        Pose3d tagTarget = tagTargetPre.get();
-        if (tagTarget == null) {
-            System.out.println("TARGET IS NULL");
-            return null;
-        }
-
-        System.out.println("------ TAG TARGET: " + target.getTag());
-
-        // PATHFIND - Both
-        Rotation3d tagRotation = tagTarget.getRotation().plus(new Rotation3d(0, 0, Math.PI));
-
-       //double hpExtraPadding = target.isReef() ? 0 : -1.5;  This seems to leave it too far back, reducing
-        double padding = target.isReef() ? SF2Constants.SEAFINDER2_ASTAR_PADDING : SF2Constants.SEAFINDER2_ASTAR_PADDING_HP;
-
-        // Pose3d pathfindTarget3d = new Pose3d(
-        //         tagTarget.getX() + SF2Constants.SEAFINDER2_ASTAR_PADDING * Math.cos(tagRotation.getZ())
-        //                 + Math.sin(tagRotation.getZ()) + Constants.FIELD_X_MIDPOINT,
-        //         tagTarget.getY() + SF2Constants.SEAFINDER2_ASTAR_PADDING * Math.sin(tagRotation.getZ())
-        //                 - Math.cos(tagRotation.getZ()) + Constants.FIELD_Y_MIDPOINT,
-        //         tagTarget.getZ(),
-        //         tagRotation);
-
-        double fieldX = tagTarget.getX() + padding * Math.cos(tagRotation.getZ()) + Constants.FIELD_X_MIDPOINT;
-
-        double fieldY = tagTarget.getY() + padding * Math.sin(tagRotation.getZ()) + Constants.FIELD_Y_MIDPOINT;
-
-
-        Pose3d pathfindTarget3d = new Pose3d(
-            fieldX,
-            fieldY,
-            tagTarget.getZ(),
-            tagRotation
-        );
-
-        Pose2d pathfindTarget = pathfindTarget3d.toPose2d();
-
-        PathConstraints constraints = new PathConstraints(SF2Constants.SEAFINDER2_MAX_VELOCITY,
-                SF2Constants.SEAFINDER2_MAX_ACCELERATION, SF2Constants.SEAFINDER2_MAX_ROTATIONAL_VELOCITY,
-                SF2Constants.SEAFINDER2_MAX_ROTATIONAL_ACCELERATION);
-
-        System.out.println(pathfindTarget);
-        this.setLabel(pathfindTarget, "pathfind_target");
-
-        Command pathfindCommand = AutoBuilder.pathfindToPose(
-                pathfindTarget,
-                constraints,
-                0);
-        Command stopDrivetrainCommand = new StopDrivetrain(this);
-
-        return new SequentialCommandGroup(
-            pathfindCommand,
-            stopDrivetrainCommand
-        );
-    }
-
 }

@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -8,7 +7,7 @@ import edu.wpi.first.math.util.Units;
 
 public class Constants {
     // Critical Generic Constants
-    public static final double MAX_SPEED = 0.475; // kSpeedAt12Volts desired top speed
+    public static final double MAX_SPEED = 0.6; // kSpeedAt12Volts desired top speed
     public static final double MAX_SPEED_TURBO = 0.65;
     public static final double MAX_ANGULAR_RATE = 0.45; // 3/4 of a rotation per second max angular velocity
 
