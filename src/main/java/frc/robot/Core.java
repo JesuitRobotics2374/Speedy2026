@@ -11,6 +11,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drivetrain.TunerConstants;
 
@@ -39,6 +40,7 @@ public class Core {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
+    public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
 
     public Core() {
 
@@ -131,6 +133,10 @@ public class Core {
                         .withRotationalRate(-driveController.getRightX() * MaxAngularRate * getAxisMovementScale())));
 
         driveController.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric())); // RESET POSE
+
+        driveController.a().onTrue(intakeSubsystem.intake());
+        driveController.b().onTrue(intakeSubsystem.purge());
+        driveController.x().onTrue(intakeSubsystem.stop());
     }
 
     public CommandSwerveDrivetrain getDrivetrain() {
