@@ -36,7 +36,7 @@ import frc.robot.subsystems.drivetrain.TunerConstants.TunerSwerveDrivetrain;
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
  * Subsystem so it can easily be used in command-based projects.
  */
-public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
+public class DriveSubsystem extends TunerSwerveDrivetrain implements Subsystem {
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
@@ -56,11 +56,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // CUSTOM DECLARATIONS
     private final SwerveDrivePoseEstimator estimator;
     Field2d field = new Field2d();
-
-    public CoreCANrange robotRangeRight = new CoreCANrange(18, "FastFD");
-    public CoreCANrange robotRangeLeft = new CoreCANrange(19, "FastFD");
-
-    public CoreCANrange robotRangeBack = new CoreCANrange(17, "FastFD");
 
     private final SwerveRequest.ApplyRobotSpeeds autoRequest = new SwerveRequest.ApplyRobotSpeeds();
 
@@ -137,7 +132,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * @param drivetrainConstants Drivetrain-wide constants for the swerve drive
      * @param modules             Constants for each specific module
      */
-    public CommandSwerveDrivetrain(
+    public DriveSubsystem(
             SwerveDrivetrainConstants drivetrainConstants,
             SwerveModuleConstants<?, ?, ?>... modules) {
         super(drivetrainConstants, modules);
