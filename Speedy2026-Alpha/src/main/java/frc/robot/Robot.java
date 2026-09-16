@@ -1,0 +1,73 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package frc.robot;
+
+import com.pathplanner.lib.commands.PathfindingCommand;
+import org.wpilib.framework.TimedRobot;
+import org.wpilib.command2.CommandScheduler;
+
+public class Robot extends TimedRobot {
+
+    private final Core m_core;
+
+    public Robot() {
+        m_core = new Core();
+        
+
+        // m_core.getDrivetrain().seedRobotAuto();
+
+        // PathfindingCommand.warmupCommand();
+    }
+
+    @Override
+    public void robotPeriodic() {
+        CommandScheduler.getInstance().run();
+    }
+
+    @Override
+    public void disabledInit() {
+    }
+
+    @Override
+    public void disabledPeriodic() {
+    }
+
+    @Override
+    public void disabledExit() {
+    }
+
+    @Override
+    public void autonomousInit() {
+      
+    }
+
+    @Override
+    public void autonomousPeriodic() {
+    }
+
+    @Override
+    public void autonomousExit() {
+       
+    }
+
+    @Override
+    public void teleopInit() {
+       
+    }
+
+    @Override
+    public void teleopPeriodic() {
+        m_core.corePeriodic();
+    }
+
+    @Override
+    public void teleopExit() {
+        
+    }
+
+    @Override
+    public void simulationPeriodic() {
+    }
+}
